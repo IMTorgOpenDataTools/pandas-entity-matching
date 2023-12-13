@@ -16,7 +16,7 @@ from pathlib import Path
 
 def prepare_dataset(preprocess=True):
     filename = 'data.csv'
-    filepath = './tests' / Path(filename)
+    filepath = './tests/data' / Path(filename)
     raw = pd.read_csv(filepath)
 
     #duplicates (same CID)

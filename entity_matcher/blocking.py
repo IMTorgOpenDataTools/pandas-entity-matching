@@ -22,6 +22,13 @@ nltk.download('stopwords')
 
 
 def standard_blocking(field_values: pd.Series) -> dict[str, list]:
+    """Each value has an index of rows it is used.
+    
+    Usage::
+        >>> sb_title = standard_blocking(pp_df.title)
+        >>> key = list(sb_title.keys())[5]
+        >>> sb_title[key]
+    """
 
     blocks = defaultdict(list)
     for idx, key in enumerate(field_values):
@@ -34,17 +41,20 @@ def standard_blocking(field_values: pd.Series) -> dict[str, list]:
 stop_words_for_token_blocks = set(stopwords.words('english') + list(string.punctuation))
 
 def token_blocking(df: pd.DataFrame, stop_words: set) -> dict[str, list]:
+    """Each token (of the row of concatenated fields) has an index of rows it is used.
+
+    Usage::
+        >>> tmp = list(token_blocks.values())[0]
+        >>> pp_df[columns].iloc[tmp]
+    """
 
     blocks = defaultdict(list)
-
     for i, row in enumerate(df.itertuples()):
-
         # concatenate columns and tokenize
         string = " ".join([str(value) for value in row if not pd.isna(value)])
         tokens = set(
             [word for word in word_tokenize(string) if word not in stop_words]
         )
-
         # create blocks
         for token in tokens:
             blocks[token].append(i)
@@ -55,6 +65,12 @@ def token_blocking(df: pd.DataFrame, stop_words: set) -> dict[str, list]:
 def sorted_neighborhood(
     df: pd.DataFrame, keys: list, window_size: int = 3
 ) -> np.ndarray:
+    """Pairs of rows created from the sorted columns
+
+    Usage::
+        >>> sn_pairs = sorted_neighborhood(pp_df, columns)
+        >>> pp_df[columns].iloc[sn_pairs[3]]
+    """
 
     sorted_indices = (
         df[keys].dropna(how="all").sort_values(keys).index.tolist()

@@ -22,4 +22,4 @@ def test_preprocess():
     #preprocess
     pp_df = preprocess_df_columns(df, cols=["title", "artist", "album"])
     
-    assert True == True
+    assert pp_df.shape == (127451, 12)
