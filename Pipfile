@@ -9,6 +9,7 @@ pandas = "*"
 nltk = "*"
 scikit-learn = "*"
 psutil = "*"
+memory-profiler = "*"
 
 [dev-packages]
 

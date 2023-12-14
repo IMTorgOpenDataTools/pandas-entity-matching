@@ -1,5 +1,7 @@
 # Entity Matcher for Pandas
 
+Entity Matching routines that play nicely with pandas DataFrames.
+
 
 ## Usage
 
@@ -17,11 +19,15 @@ import entity_matcher as em
 
 df = pd.read_csv('./tests/data/data.csv')
 field_config = {
-    "artist": "fuzzy"
+    # <field>: <sim_type>
+    "title": "fuzzy",
+    "artist": "fuzzy",
+    "album": "fuzzy",
+    "number": "exact",
 }
 
 Matcher = em.EntityMatcher(df, field_config)
-df['Proposed Matches'] = Matcher.get_matches('cosine_similarity')
+df['Proposed Matches'] = Matcher.get_matches()
 pd.crosstab(index=df['CID'], columns=df['Proposed Matches'])
 ```
 
@@ -41,8 +47,6 @@ Use the following commands:
     c(continue) – continue execution and only stop when a breakpoint is encountered
     unt(until) – continue execution until the line with a number greater than the current one is reached
     q(quit) – quit the debugger/execution
-
-
 
 
 ## References

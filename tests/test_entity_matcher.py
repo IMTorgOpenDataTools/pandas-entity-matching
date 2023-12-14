@@ -29,8 +29,8 @@ def test_get_matches_basic():
     field_config['title'] = 'fuzzy'
 
     Matcher = em.EntityMatcher(samp_df, field_config)
-    samp_df['Proposed Matches'] = Matcher.get_matches('cosine_similarity')
+    samp_df['Proposed Matches'] = Matcher.get_matches()
     matched = samp_df[['title','group']][samp_df['Proposed Matches']!=''].sort_values('group')
     print(matched)
-    
+
     assert matched.shape == (6,2)
