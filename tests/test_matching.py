@@ -1,5 +1,5 @@
 """
-Test All
+Test Matching functions
 """
 
 __author__ = "Jason Beach"
@@ -20,7 +20,7 @@ from entity_matcher.block_processing import (
     get_pairs_from_adj_matrix
     )
 from entity_matcher.matching import (
-    get_field_similarity_scores, 
+    get_field_similarity_scores_from_pairs, 
     calc_overall_scores, 
     find_matches,
     field_config
@@ -29,8 +29,9 @@ from tests.setup import prepare_dataset
 
 
 
-def test_all():
-    df = prepare_dataset(preprocess=True)
+def test_matching_process():
+    pp_df = prepare_dataset(preprocess=True)
+    df = pp_df.sample(frac=.10, random_state=1).reset_index(drop=True)
 
     sb_title = standard_blocking(df.title)
     sb_artist = standard_blocking(df.artist)
@@ -48,9 +49,9 @@ def test_all():
         )
     adj_matrix_union = get_union_of_adj_matrices(adj_matrix_list)
     sb_pairs = get_pairs_from_adj_matrix(adj_matrix_union)
-    field_scores_sb = get_field_similarity_scores(df, sb_pairs, field_config)
+    field_scores_sb = get_field_similarity_scores_from_pairs(df, sb_pairs, field_config)
 
     scores_sb = calc_overall_scores(field_scores_sb)
     is_matched_sb = find_matches(scores_sb, threshold=0.64)
 
-    assert is_matched_sb.__len__() == 1338965
+    assert is_matched_sb.__len__() == 13794

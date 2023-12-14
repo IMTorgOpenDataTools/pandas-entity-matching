@@ -3,11 +3,26 @@
 
 ## Usage
 
-Main entrypoint to the program:
+Install dependencies
 
 ```
 pipenv install
-pipenv run python cbdc_scraper/scraper.py
+```
+
+Typical usage
+
+```
+import pandas as pd
+import entity_matcher as em
+
+df = pd.read_csv('./tests/data/data.csv')
+field_config = {
+    "artist": "fuzzy"
+}
+
+Matcher = em.EntityMatcher(df, field_config)
+df['Proposed Matches'] = Matcher.get_matches('cosine_similarity')
+pd.crosstab(index=df['CID'], columns=df['Proposed Matches'])
 ```
 
 
@@ -15,7 +30,7 @@ pipenv run python cbdc_scraper/scraper.py
 
 Basic testing can be performed using `pytest`.
 
-Command line testing of a specific test method can be performed using: `pytest --trace tests/test_all.py -k test_all`
+Command line testing of a specific test method can be performed using: `pytest --trace tests/test_entity_matcher.py -k test_get_matches_basic`
 
 Use the following commands:
 
