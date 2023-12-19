@@ -65,7 +65,7 @@ def run_matching_process():
     sleep(.1)
     sb_pairs = get_pairs_from_adj_matrix(adj_matrix_union)
     sleep(.1)
-    Matcher = em.EntityMatcher(df, field_config)
+    Matcher = em.EntityMatcher(field_config)
     field_scores_sb = Matcher.get_field_similarity_scores_from_pairs(df, sb_pairs, field_config)
     sleep(.1)
 

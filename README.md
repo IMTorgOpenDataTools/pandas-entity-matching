@@ -26,8 +26,8 @@ field_config = {
     "number": "exact",
 }
 
-Matcher = em.EntityMatcher(df, field_config)
-df['Proposed Matches'] = Matcher.get_matches()
+Matcher = em.EntityMatcher(field_config)
+df['Proposed Matches'] = Matcher.get_matches(df)
 pd.crosstab(index=df['CID'], columns=df['Proposed Matches'])
 ```
 

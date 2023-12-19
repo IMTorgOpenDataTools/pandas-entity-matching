@@ -27,43 +27,66 @@ class EntityMatcher:
     """..."""
 
     _threshold = 0.70
-    _available_memory = psutil.virtual_memory().free       #TODO:determine process based on resources
+    _available_memory = psutil.Process().memory_info().rss          #largest physical memory process used; convert to MB rss / 1024 ** 2
     _available_methods = ['fuzzy', 'exact']
 
 
-    def __init__(self, df: pd.DataFrame, field_config: dict[str, str]) -> None:
-        self.df = df
-        self.field_config = field_config
-
-
-    def get_matches(self, blocking=False) -> np.ndarray:
-        """..."""
-        for method in self.field_config.values():
+    def __init__(self, field_config: dict[str, str]) -> None:
+        for method in field_config.values():
             if method not in self._available_methods:
                 raise TypeError
-        
-        '''#TODO:fix determine if memory will support number of records
-        for field in self.field_config:
-            if self.df[field].memory_usage < self._available_memory:        
-        '''
+        self.field_config = field_config
 
+    
+    def is_memory_constrained(self, arr: np.array) -> bool:
+        """Determine if the dot product is constrained by memory.
+        Assuming default datatype `float64` with 8 bytes.
+        ref: https://stackoverflow.com/questions/25046076/python-numpy-huge-matrices-multiplication
+        """
+        result = {
+            'record_size': True,
+            'dot_product_size': True
+        }
+        item_size = arr.dtype.itemsize
+        records_size_in_mb = item_size * arr.shape[0] * 1 / 1024 ** 2
+        assert records_size_in_mb == arr.nbytes
+        dot_product_size_in_mb = item_size * arr.shape[0] * arr.shape[0] / 1024 ** 2
+
+        if records_size_in_mb < self._available_memory:
+            result['record_size'] = False
+        if dot_product_size_in_mb < self._available_memory:
+            result['dot_product_size'] = False
+
+        return result
+
+
+    def get_matches(self, df: pd.DataFrame, blocking: bool=False) -> np.ndarray:
+        """..."""
+        
+        #check memory requirement
         if not blocking:
-            rows = self.df.shape[0] - 1
+            for field in self.field_config:
+                if self.is_memory_constrained(df[field])['dot_product_size']:
+                    blocking = True      
+
+        #use blocking if not enough memory
+        if not blocking:
+            rows = df.shape[0] - 1
             groups = []
             for idx in range(0,rows):
                 group = [[idx, item] for item in range(0,rows) if not (idx <= item)]
                 groups.extend(group)
             pairs = np.array(groups)
 
-        scores = self.get_field_similarity_scores_from_pairs(df=self.df, pairs=pairs, field_config=self.field_config)
-        groups = self.match_pairs_to_columns(pairs, scores, self._threshold)
+        scores = self.get_field_similarity_scores_from_pairs(df=df, pairs=pairs, field_config=self.field_config)
+        groups = self.match_pairs_to_columns(df, pairs, scores, self._threshold)
 
         return groups
     
 
     def match_pairs_to_columns(
             self, 
-            pairs: np.ndarray, scores: np.ndarray, threshold: float, new_column_name: str ='group'
+            df: pd.DataFrame, pairs: np.ndarray, scores: np.ndarray, threshold: float, new_column_name: str ='group'
             ) -> np.ndarray:
         """..
 
@@ -81,17 +104,17 @@ class EntityMatcher:
         matches = tmpDf[tmpDf['scores']>threshold].reset_index(drop=True)
         assert matches[0].unique().shape[0] <= matches[0].shape[0]
 
-        self.df[new_column_name] = ''
+        df[new_column_name] = ''
         for i in matches.index:
             #print( df['title'].iloc[ list(matches[[0,1]].iloc[i]) ] )
             grp = list(matches[[0,1]].iloc[i])[0]
-            if self.df[new_column_name].iloc[grp] == '':
+            if df[new_column_name].iloc[grp] == '':
                 rows = matches[matches[0]==grp]
                 idxs = list(rows[1])
                 idxs.insert(0, grp)
-                self.df[new_column_name].iloc[ idxs ] = grp
+                df[new_column_name].iloc[ idxs ] = grp
 
-        return self.df[new_column_name]
+        return df[new_column_name]
     
 
     def get_field_similarity_scores_from_pairs(

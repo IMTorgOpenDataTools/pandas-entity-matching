@@ -28,8 +28,8 @@ def test_get_matches_single_field():
     field_config.clear()
     field_config['title'] = 'fuzzy'
 
-    Matcher = em.EntityMatcher(samp_df, field_config)
-    samp_df['Proposed Matches'] = Matcher.get_matches()
+    Matcher = em.EntityMatcher(field_config)
+    samp_df['Proposed Matches'] = Matcher.get_matches(samp_df)
     matched = samp_df[['title','group']][samp_df['Proposed Matches']!=''].sort_values('group')
     print(matched)
 
@@ -45,8 +45,8 @@ def test_get_matches_multiple_fields():
     field_config['artist'] = 'fuzzy'
     field_config['album'] = 'fuzzy'
 
-    Matcher = em.EntityMatcher(samp_df, field_config)
-    samp_df['Proposed Matches'] = Matcher.get_matches()
+    Matcher = em.EntityMatcher(field_config)
+    samp_df['Proposed Matches'] = Matcher.get_matches(samp_df)
     matched = samp_df[['title','artist','album','group']][samp_df['Proposed Matches']!=''].sort_values('group')
     print(matched)
 
