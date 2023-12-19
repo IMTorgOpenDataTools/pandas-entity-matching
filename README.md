@@ -57,6 +57,9 @@ Use the following commands:
 
 ## TODO
 
+* ~~add blocking to pipeline~~
+  - provide consisten blocking output
+  - separate blocking from scoring method
 * add matchers
   - spacy word embedding cosine
   - levenshtein distance
@@ -64,8 +67,6 @@ Use the following commands:
   - email
   - phone
   - address
-* add blocking to pipeline
-  - ...
 * add automated analysis review
   - perform all blocking and all scoring methods
   - generate table of results

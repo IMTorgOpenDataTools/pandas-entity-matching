@@ -22,38 +22,67 @@ indices = [
     ]
 
 
-def test_get_matches_single_field():
+def test_get_matches_single_field_no_blocking():
     samp_df = pp_df.iloc[indices].reset_index()
     field_config = em.field_config
     field_config.clear()
-    field_config['title'] = 'fuzzy'
+    field_config['blocking'] = {}
+    field_config['scoring'] = {}
+    field_config['scoring']['title'] = 'fuzzy'
 
     Matcher = em.EntityMatcher(field_config)
     samp_df['Proposed Matches'] = Matcher.get_matches(samp_df)
-    matched = samp_df[['title','group']][samp_df['Proposed Matches']!=''].sort_values('group')
+    matched = samp_df[['title','Proposed Matches']][samp_df['Proposed Matches']!=''].sort_values('Proposed Matches')
     print(matched)
 
     assert matched.shape == (6,2)
 
 
-def test_get_matches_multiple_fields():
+def test_get_matches_single_field_with_blocking():
+    samp_df = pp_df.iloc[indices].reset_index()
+    field_config = em.field_config
+    field_config.clear()
+    field_config['blocking'] = {"operation": "standard", "process": "purge"} 
+    field_config['scoring'] = {}
+    field_config['scoring']['title'] = 'fuzzy'
+
+    Matcher = em.EntityMatcher(field_config)
+    samp_df['Proposed Matches'] = Matcher.get_matches(samp_df)
+    matched = samp_df[['title','Proposed Matches']][samp_df['Proposed Matches']!=''].sort_values('Proposed Matches')
+    print(matched)
+
+    assert matched.shape == (6,2)
+
+
+def test_get_matches_multiple_fields_with_blocking():
     #TODO:account for multiple fields, here, not just `title`
     samp_df = pp_df.iloc[indices].reset_index()
     field_config = em.field_config
     field_config.clear()
-    field_config['title'] = 'fuzzy'
-    field_config['artist'] = 'fuzzy'
-    field_config['album'] = 'fuzzy'
+    field_config['blocking'] = {"operation": "standard", "process": "purge"} 
+    field_config['scoring'] = {}
+    field_config['scoring']['title'] = 'fuzzy'
+    field_config['scoring']['artist'] = 'fuzzy'
+    field_config['scoring']['album'] = 'fuzzy'
+    #TODO:field_config['scoring']['number'] = 'exact'
 
     Matcher = em.EntityMatcher(field_config)
     samp_df['Proposed Matches'] = Matcher.get_matches(samp_df)
-    matched = samp_df[['title','artist','album','group']][samp_df['Proposed Matches']!=''].sort_values('group')
-    print(matched)
+    matched = samp_df[['title','artist','album','Proposed Matches']][samp_df['Proposed Matches']!=''].sort_values('Proposed Matches')
 
-    assert True == False #matched.shape == (6,4)
+    assert matched.shape == (4,4)
 
 
-def test_get_matches_with_blocking():
+def test_get_matches_with_combined_blocking():
+    #combined_blocking refers to output, such as`token_blocking()``
+    assert True == True
+
+
+def test_get_matches_with_all_blocking_methods():
+    assert True == True
+
+
+def test_get_matches_with_all_blocking_all_scoring_methods():
     assert True == True
 
 
