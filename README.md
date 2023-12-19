@@ -53,3 +53,22 @@ Use the following commands:
 
 * Adapted from basic workflow provided by Tomonori Masui using [notebook](https://github.com/tomonori-masui/entity-resolution/blob/main/entity_resolution_implementations.ipynb)
 * Original dataset from University of Leipzig, Database Group Leipzig, [Benchmark datasets for entity resolution](https://dbs.uni-leipzig.de/research/projects/object_matching/benchmark_datasets_for_entity_resolution)
+
+
+## TODO
+
+* add matchers
+  - spacy word embedding cosine
+  - levenshtein distance
+* add field-specific scoring formats
+  - email
+  - phone
+  - address
+* add blocking to pipeline
+  - ...
+* add automated analysis review
+  - perform all blocking and all scoring methods
+  - generate table of results
+* separate workflows for: 
+  - within column entity-resolution
+  - merge two columns using entity-resolution

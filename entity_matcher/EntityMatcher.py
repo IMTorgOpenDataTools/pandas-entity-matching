@@ -11,7 +11,9 @@ __license__ = "MIT"
 from .config import field_config
 from .matching import (
     cosine,
-    exact
+    exact,
+    levenshtein,
+    embedding
 )
 
 import pandas as pd
@@ -28,9 +30,11 @@ class EntityMatcher:
     _available_memory = psutil.virtual_memory().free       #TODO:determine process based on resources
     _available_methods = ['fuzzy', 'exact']
 
+
     def __init__(self, df: pd.DataFrame, field_config: dict[str, str]) -> None:
         self.df = df
         self.field_config = field_config
+
 
     def get_matches(self, blocking=False) -> np.ndarray:
         """..."""
@@ -38,7 +42,7 @@ class EntityMatcher:
             if method not in self._available_methods:
                 raise TypeError
         
-        '''#TODO:fix
+        '''#TODO:fix determine if memory will support number of records
         for field in self.field_config:
             if self.df[field].memory_usage < self._available_memory:        
         '''
@@ -72,6 +76,7 @@ class EntityMatcher:
         scores['title'].shape
         (13794,)."""
         tmpDf = pd.DataFrame(pairs)
+        #TODO:account for multiple fields, here, not just `title`
         tmpDf['scores'] = scores['title']
         matches = tmpDf[tmpDf['scores']>threshold].reset_index(drop=True)
         assert matches[0].unique().shape[0] <= matches[0].shape[0]
@@ -118,12 +123,18 @@ class EntityMatcher:
         field_scores = {}
         for field, sim_type in field_config.items():
             match sim_type:
-                #TODO:add levenshtein
+                case "exact":
+                    field_scores[field] = exact.exact_matches(df[field], pairs)
                 case "fuzzy": 
                     mod_df = df[field].fillna("")
                     field_scores[field] = cosine.cosine_similarities(mod_df, pairs)
-                case "exact":
-                    field_scores[field] = exact.exact_matches(df[field], pairs)
+                case "levenshtein":
+                    mod_df = df[field].fillna("")
+                    field_scores[field] = levenshtein.levenshtein_distance(mod_df, pairs)       #TODO
+                case "embedding":
+                    mod_df = df[field].fillna("")
+                    field_scores[field] = embedding.nn_cosine_similarities(mod_df, pairs)       #TODO
+
         return field_scores
 
 

@@ -28,8 +28,8 @@ def standard_blocking(field_values: pd.Series) -> dict[str, list]:
         >>> sb_title = standard_blocking(pp_df.title)
         >>> key = list(sb_title.keys())[5]
         >>> sb_title[key]
+            'macabre discovery distorted drama': [5, 109011]
     """
-
     blocks = defaultdict(list)
     for idx, key in enumerate(field_values):
         if key is not None:
@@ -44,10 +44,13 @@ def token_blocking(df: pd.DataFrame, stop_words: set) -> dict[str, list]:
     """Each token (of the row of concatenated fields) has an index of rows it is used.
 
     Usage::
+        >>> token_blocks = token_blocking(pp_df[columns], stop_words_for_token_blocks)
+        >>> key = list(token_blocks.keys())[0]
+        >>> token_blocks[key]
+            [0, 1322, 2024, 2522, 3140, 3567, 4838, 8641, 8808, 12284, 13095, 15137, 16321, 18281, ...]
         >>> tmp = list(token_blocks.values())[0]
         >>> pp_df[columns].iloc[tmp]
     """
-
     blocks = defaultdict(list)
     for i, row in enumerate(df.itertuples()):
         # concatenate columns and tokenize
@@ -69,6 +72,14 @@ def sorted_neighborhood(
 
     Usage::
         >>> sn_pairs = sorted_neighborhood(pp_df, columns)
+        >>> sn_pairs
+            array([[ 99353,  13878],
+                   [ 99353,  73335],
+                   [ 13878,  73335],
+                   ...,
+                   [ 59927,  20462],
+                   [127393,  20462],
+                   [ 90786,  20462]])
         >>> pp_df[columns].iloc[sn_pairs[3]]
     """
 

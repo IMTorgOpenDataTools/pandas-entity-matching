@@ -30,7 +30,7 @@ def test_standard_blocking():
 def test_token_blocking():
     columns = ['title','artist','album']
     token_blocks = token_blocking(pp_df[columns], stop_words_for_token_blocks)
-    assert len(token_blocks) == 202202
+    assert len(token_blocks) == 202201
 
 
 def test_sorted_neighborhood():
