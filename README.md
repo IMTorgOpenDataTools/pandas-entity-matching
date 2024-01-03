@@ -17,18 +17,33 @@ Typical usage
 import pandas as pd
 import entity_matcher as em
 
-df = pd.read_csv('./tests/data/data.csv')
+raw = pd.read_csv('/workspaces/entity-matching/tests/data/data.csv')
+#raw = pd.read_csv('./tests/data/data.csv')
 field_config = {
-    # <field>: <sim_type>
+  "blocking":{"operation": "standard", "process": "purge"},
+  "scoring":{
     "title": "fuzzy",
     "artist": "fuzzy",
-    "album": "fuzzy",
-    "number": "exact",
+    "album": "fuzzy"
+  }
 }
 
 Matcher = em.EntityMatcher(field_config)
+df = Matcher.preprocess(raw)
 df['Proposed Matches'] = Matcher.get_matches(df)
 pd.crosstab(index=df['CID'], columns=df['Proposed Matches'])
+```
+
+
+## Build
+
+Ensure to remove any previous artifacts
+
+```
+pipenv shell
+rm -r pandas_entity_matcher.egg-info/ dist/
+find . | grep -E "(/__pycache__$|\.pyc$|\.pyo$)" | xargs rm -rf
+python -m build
 ```
 
 
@@ -58,8 +73,8 @@ Use the following commands:
 ## TODO
 
 * ~~add blocking to pipeline~~
-  - provide consisten blocking output
-  - separate blocking from scoring method
+  - ~~provide consistent blocking output~~
+  - ~~separate blocking from scoring method~~
 * add matchers
   - spacy word embedding cosine
   - levenshtein distance

@@ -55,7 +55,6 @@ def test_get_matches_single_field_with_blocking():
 
 
 def test_get_matches_multiple_fields_with_blocking():
-    #TODO:account for multiple fields, here, not just `title`
     samp_df = pp_df.iloc[indices].reset_index()
     field_config = em.field_config
     field_config.clear()
@@ -71,6 +70,27 @@ def test_get_matches_multiple_fields_with_blocking():
     matched = samp_df[['title','artist','album','Proposed Matches']][samp_df['Proposed Matches']!=''].sort_values('Proposed Matches')
 
     assert matched.shape == (4,4)
+
+#NOTE: this test requires a long runtime
+def test_get_matches_multiple_fields_with_blocking_ALL_DATA():
+    raw = prepare_dataset(preprocess=False)
+    raw_df = raw.reset_index()
+    field_config = em.field_config
+    field_config.clear()
+    field_config['blocking'] = {"operation": "standard", "process": "purge"} 
+    field_config['scoring'] = {}
+    field_config['scoring']['title'] = 'fuzzy'
+    field_config['scoring']['artist'] = 'fuzzy'
+    field_config['scoring']['album'] = 'fuzzy'
+
+    Matcher = em.EntityMatcher(field_config)
+    samp_df = Matcher.preprocess(raw_df)
+    samp_df['Proposed Matches'] = Matcher.get_matches(samp_df)
+    matched = samp_df[['title','artist','album','Proposed Matches']][samp_df['Proposed Matches']!=''].sort_values('Proposed Matches')
+    counts = matched['Proposed Matches'].value_counts()
+
+    assert matched.shape == (96062, 4)
+    assert list(counts[:3]) == [449, 290, 267]
 
 
 def test_get_matches_with_combined_blocking():

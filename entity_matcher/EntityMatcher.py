@@ -20,6 +20,7 @@ from .block_processing import (
     purge_blocks,
     meta_blocks
 )
+from . import preprocess
 from .matching import (
     cosine,
     exact,
@@ -56,6 +57,17 @@ class EntityMatcher:
                 if method not in self._available_scoring_methods:
                     raise TypeError
         self.field_config = field_config
+
+
+    def preprocess(self, df: pd.DataFrame, columns: list=None) -> pd.DataFrame:
+        """Prepare df columns for matching."""
+        if not columns:
+            columns = list( self.field_config['scoring'].keys() )
+        for column in columns:
+            if column not in df.columns:
+                print(f'Column ${column} not in dataframe')
+                raise TypeError
+        return preprocess.preprocess_df_columns(df, columns)
 
 
     def get_matches(self, df: pd.DataFrame) -> np.ndarray:
@@ -163,7 +175,19 @@ class EntityMatcher:
                     for field in fields:
                         dicts = purge_blocks(pairs[field])
                         dicts_without_nan = {k:v for k,v in dicts.items() if k is not np.nan}
-                        pairs[field] = np.array( [np.array(pair) for pair in dicts_without_nan.values()], dtype="object" )
+                        indices = np.array( [np.array(pair) for pair in dicts_without_nan.values()], dtype="object" )
+                        tuples = []
+                        for idx, line in enumerate(indices):
+                            grp = []
+                            if len(line) > 2:
+                                grp.append(line[:2])
+                                for item in line[2:]:
+                                    grp.append(np.append(line[0], item))
+                            else:
+                                grp.append(line)
+                            #print(idx)
+                            tuples.extend(grp)
+                        pairs[field] = np.array(tuples)
                     
         return pairs
     
