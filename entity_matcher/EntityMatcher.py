@@ -279,17 +279,20 @@ class EntityMatcher:
         
         scores = get_field_similarity_scores_from_pairs(df, sb_pairs, field_config)
         scores['title'].shape
-        (13794,)."""
+        (13794,).
+        
+        TODO:optimize performance 
+        """
 
         df[new_column_name] = ''
         for i in matches.index:
             #print( df['title'].iloc[ list(matches[[0,1]].iloc[i]) ] )
-            grp = list(matches[[0,1]].iloc[i])[0]
-            if df[new_column_name].iloc[grp] == '':
-                rows = matches[matches[0]==grp]
-                idxs = list(rows[1])
-                idxs.insert(0, grp)
-                df[new_column_name].iloc[ idxs ] = grp
+            grp = list(matches[[0,1]].iloc[i])
+            if df[new_column_name].iloc[grp[0]] == '':
+                rows = matches[matches[0].isin(grp)]
+                idxs = list(set(rows[1].values))
+                idxs.insert(0, grp[0])
+                df[new_column_name].iloc[ idxs ] = grp[0]
         new_column = df[new_column_name]
         df.drop(columns=[new_column_name], inplace=True)
         return new_column

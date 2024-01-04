@@ -11,6 +11,7 @@ import entity_matcher as em
 
 from tests.setup import prepare_dataset
 
+import time
 
 #setup
 pp_df = prepare_dataset(preprocess=True)
@@ -73,6 +74,7 @@ def test_get_matches_multiple_fields_with_blocking():
 
 #NOTE: this test requires a long runtime
 def test_get_matches_multiple_fields_with_blocking_ALL_DATA():
+    start = time.time()
     raw = prepare_dataset(preprocess=False)
     raw_df = raw.reset_index()
     field_config = em.field_config
@@ -88,9 +90,11 @@ def test_get_matches_multiple_fields_with_blocking_ALL_DATA():
     samp_df['Proposed Matches'] = Matcher.get_matches(samp_df)
     matched = samp_df[['title','artist','album','Proposed Matches']][samp_df['Proposed Matches']!=''].sort_values('Proposed Matches')
     counts = matched['Proposed Matches'].value_counts()
+    duration = time.time() - start
 
-    assert matched.shape == (96062, 4)
-    assert list(counts[:3]) == [449, 290, 267]
+    assert matched.shape == (97835, 4)
+    assert list(counts[:3]) == [440, 285, 266]
+    assert duration < 7 * 60           #routine takes less than 7min
 
 
 def test_get_matches_with_combined_blocking():
