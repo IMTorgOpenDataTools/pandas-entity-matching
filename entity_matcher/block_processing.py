@@ -13,7 +13,7 @@ import numpy as np
 
 
 def purge_blocks(
-    blocks: dict[str, list], purging_threshold: int = 1000
+    blocks: dict[str, list], purging_threshold: int = 10000
 ) -> dict[str, list]:
     """Reduces the number of items in a block to a maximum threshold value
 
