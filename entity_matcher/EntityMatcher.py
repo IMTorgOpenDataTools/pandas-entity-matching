@@ -41,7 +41,7 @@ class EntityMatcher:
     _threshold = 0.70
     _available_memory = psutil.Process().memory_info().rss          #largest physical memory process used; convert to MB rss / 1024 ** 2
     _available_blocking_methods = ['standard', 'purge']
-    _available_scoring_methods = ['fuzzy', 'exact']
+    _available_scoring_methods = ['exact','fuzzy','levenshtein']
     _default_combined_pair_name = 'Combined_Fields'
     _default_blocking = {"operation": "standard", "process": "purge"}      
 

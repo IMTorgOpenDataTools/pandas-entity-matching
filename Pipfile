@@ -11,6 +11,7 @@ scikit-learn = "*"
 psutil = "*"
 memory-profiler = "*"
 build = "*"
+rapidfuzz = "*"
 
 [dev-packages]
 
