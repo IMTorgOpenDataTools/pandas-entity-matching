@@ -72,12 +72,18 @@ Use the following commands:
 
 ## TODO
 
+* two tests fail
+  - test_block_processing / test_block_processing_components
+  - test_matching / test_matching_process
+* integrate with dask df for distributed matching
 * ~~add blocking to pipeline~~
   - ~~provide consistent blocking output~~
   - ~~separate blocking from scoring method~~
 * add matchers
+  - for currently available workflows check `./tests/test_entity_matcher.py`
   - spacy word embedding cosine
-  - levenshtein distance
+  - ~~levenshtein distance~~
+* key: without using multiple fields the strength of results is limited
 * add field-specific scoring formats
   - email
   - phone

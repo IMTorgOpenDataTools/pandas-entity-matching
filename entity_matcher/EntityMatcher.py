@@ -162,39 +162,13 @@ class EntityMatcher:
 
         else:
             op = field_config['blocking']['operation']
-            if op == 'standard':
-                for field in fields:
-                    pairs[field] = standard_blocking(df[field])
-                #case 'token':
-                #    for field in fields:
-                #        pairs[field] = token_blocking(df[field])
-            proc = field_config['blocking']['process']
-            if proc == 'purge':
-                for field in fields:
-                    dicts = purge_blocks(pairs[field])
-                    dicts_without_nan = {k:v for k,v in dicts.items() if k is not np.nan}
-                    indices = np.array( [np.array(pair) for pair in dicts_without_nan.values()], dtype="object" )
-                    tuples = []
-                    for idx, line in enumerate(indices):
-                        grp = []
-                        if len(line) > 2:
-                            grp.append(line[:2])
-                            for item in line[2:]:
-                                grp.append(np.append(line[0], item))
-                        else:
-                            grp.append(line)
-                        #print(idx)
-                        tuples.extend(grp)
-                    pairs[field] = np.array(tuples)
-
-            '''TODO:change when py3.10 is acceptable
             match op:
                 case 'standard':
                     for field in fields:
                         pairs[field] = standard_blocking(df[field])
-                #case 'token':
-                #    for field in fields:
-                #        pairs[field] = token_blocking(df[field])
+                case 'token':
+                    for field in fields:
+                        pairs[field] = token_blocking(df[field])
             proc = field_config['blocking']['process']
             match proc:
                 case 'purge':
@@ -214,8 +188,7 @@ class EntityMatcher:
                             #print(idx)
                             tuples.extend(grp)
                         pairs[field] = np.array(tuples)
-            '''
-                    
+
         return pairs
     
 
@@ -251,19 +224,6 @@ class EntityMatcher:
         field_scores = {}
         for field, sim_type in field_config['scoring'].items():
             pairs = pair_dict[field]
-            if sim_type == "exact":
-                    field_scores[field] = exact.exact_matches(df[field], pairs)
-            if sim_type == "fuzzy": 
-                    mod_df = df[field].fillna("")
-                    field_scores[field] = cosine.cosine_similarities(mod_df, pairs)
-            if sim_type == "levenshtein":
-                    mod_df = df[field].fillna("")
-                    field_scores[field] = levenshtein.levenshtein_distance(mod_df, pairs)       #TODO
-            if sim_type == "embedding":
-                    mod_df = df[field].fillna("")
-                    field_scores[field] = embedding.wv_cosine_similarities(mod_df, pairs)       #TODO
-
-            '''TODO:change when py3.10 is acceptable
             match sim_type:
                 case "exact":
                     field_scores[field] = exact.exact_matches(df[field], pairs)
@@ -272,11 +232,10 @@ class EntityMatcher:
                     field_scores[field] = cosine.cosine_similarities(mod_df, pairs)
                 case "levenshtein":
                     mod_df = df[field].fillna("")
-                    field_scores[field] = levenshtein.levenshtein_distance(mod_df, pairs)       #TODO
+                    field_scores[field] = levenshtein.levenshtein_distance(mod_df, pairs)
                 case "embedding":
                     mod_df = df[field].fillna("")
                     field_scores[field] = embedding.wv_cosine_similarities(mod_df, pairs)       #TODO
-            '''
         
         fields = list( pair_dict.keys() )
         #combined score across fields
